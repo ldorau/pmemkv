@@ -94,7 +94,7 @@ bool CachingEngine::readConfig(const std::string& config) {
     return true;
 }
 
-void CachingEngine::All(void* context, KVAllCallback* callback) {
+void CachingEngine::All(void* context, AllCallback* callback) {
     LOG("All");
     int result = 0;
     Each(&result, [](void* context, int kb, const char* k, int vb, const char* v) {
@@ -119,11 +119,11 @@ int64_t CachingEngine::Count() {
 
 struct EachCacheCallbackContext {
     void* context;
-    KVEachCallback* cBack;
+    EachCallback* cBack;
     std::list<std::string>* expiredKeys;
 };
 
-void CachingEngine::Each(void* context, KVEachCallback* callback) {
+void CachingEngine::Each(void* context, EachCallback* callback) {
     LOG("Each");
     std::list<std::string> removingKeys;
     EachCacheCallbackContext cxt = {context, callback, &removingKeys};
@@ -148,9 +148,9 @@ void CachingEngine::Each(void* context, KVEachCallback* callback) {
     }
 }
 
-KVStatus CachingEngine::Exists(const std::string& key) {
+Status CachingEngine::Exists(const std::string& key) {
     LOG("Exists for key=" << key);
-    KVStatus status = NOT_FOUND;
+    Status status = NOT_FOUND;
     std::string value;
     if (getKey(key, value, true))
         status = OK;
@@ -158,7 +158,7 @@ KVStatus CachingEngine::Exists(const std::string& key) {
     // todo fold into single return statement
 }
 
-void CachingEngine::Get(void* context, const std::string& key, KVGetCallback* callback) {
+void CachingEngine::Get(void* context, const std::string& key, GetCallback* callback) {
     LOG("Get key=" << key);
     std::string value;
     if (getKey(key, value, false)) (*callback)(context, (int32_t) value.size(), value.c_str());
@@ -245,7 +245,7 @@ bool CachingEngine::getFromRemoteRedis(const std::string& key, std::string& valu
     return retValue;
 }
 
-KVStatus CachingEngine::Put(const std::string& key, const std::string& value) {
+Status CachingEngine::Put(const std::string& key, const std::string& value) {
     LOG("Put key=" << key << ", value.size=" << std::to_string(value.size()));
     const time_t curSysTime = time(0);
     const std::string curTime = getTimeStamp(curSysTime);
@@ -253,7 +253,7 @@ KVStatus CachingEngine::Put(const std::string& key, const std::string& value) {
     return basePtr->Put(key, ValueWithCurTime);
 }
 
-KVStatus CachingEngine::Remove(const std::string& key) {
+Status CachingEngine::Remove(const std::string& key) {
     LOG("Remove key=" << key);
     return basePtr->Remove(key);
 }

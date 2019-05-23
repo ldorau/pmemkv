@@ -68,7 +68,7 @@ STree::~STree() {
     LOG("Stopped ok");
 }
 
-void STree::All(void* context, KVAllCallback* callback) {
+void STree::All(void* context, AllCallback* callback) {
     LOG("All");
     for (auto& iterator : *my_btree) {
         (*callback)(context, (int32_t) iterator.first.size(), iterator.first.c_str());
@@ -81,7 +81,7 @@ int64_t STree::Count() {
     return result;
 }
 
-void STree::Each(void* context, KVEachCallback* callback) {
+void STree::Each(void* context, EachCallback* callback) {
     LOG("Each");
     for (auto& iterator : *my_btree) {
         (*callback)(context, (int32_t) iterator.first.size(), iterator.first.c_str(),
@@ -89,7 +89,7 @@ void STree::Each(void* context, KVEachCallback* callback) {
     }
 }
 
-KVStatus STree::Exists(const std::string& key) {
+Status STree::Exists(const std::string& key) {
     LOG("Exists for key=" << key);
     btree_type::iterator it = my_btree->find(pstring<20>(key));
     if (it == my_btree->end()) {
@@ -99,7 +99,7 @@ KVStatus STree::Exists(const std::string& key) {
     return OK;
 }
 
-void STree::Get(void* context, const std::string& key, KVGetCallback* callback) {
+void STree::Get(void* context, const std::string& key, GetCallback* callback) {
     LOG("Get using callback for key=" << key);
     btree_type::iterator it = my_btree->find(pstring<20>(key));
     if (it == my_btree->end()) {
@@ -109,7 +109,7 @@ void STree::Get(void* context, const std::string& key, KVGetCallback* callback) 
     (*callback)(context, (int32_t) it->second.size(), it->second.c_str());
 }
 
-KVStatus STree::Put(const std::string& key, const std::string& value) {
+Status STree::Put(const std::string& key, const std::string& value) {
     LOG("Put key=" << key << ", value.size=" << std::to_string(value.size()));
     try {
         auto result = my_btree->insert(std::make_pair(pstring<MAX_KEY_SIZE>(key), pstring<MAX_VALUE_SIZE>(value)));
@@ -133,7 +133,7 @@ KVStatus STree::Put(const std::string& key, const std::string& value) {
     }
 }
 
-KVStatus STree::Remove(const std::string& key) {
+Status STree::Remove(const std::string& key) {
     LOG("Remove key=" << key);
     try {
         auto result = my_btree->erase(key);

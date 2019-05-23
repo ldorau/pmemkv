@@ -65,7 +65,7 @@ int main() {
     KVEngine* kv = KVEngine::Start("vsmap", "{\"path\":\"/dev/shm/\"}");
 
     LOG("Putting new key");
-    KVStatus s = kv->Put("key1", "value1");
+    Status s = kv->Put("key1", "value1");
     assert(s == OK && kv->Count() == 1);
 
     LOG("Reading key back");
@@ -118,7 +118,7 @@ int main() {
     LOG("Putting new key");
     char* key1 = "key1";
     char* value1 = "value1";
-    KVStatus s = kvengine_put(kv, strlen(key1), key1, strlen(value1), value1);
+    Status s = kvengine_put(kv, strlen(key1), key1, strlen(value1), value1);
     assert(s == OK && kvengine_count(kv) == 1);
 
     LOG("Reading key back");

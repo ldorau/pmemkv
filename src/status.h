@@ -30,38 +30,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#ifndef PMEMKV_STATUS_H
+#define PMEMKV_STATUS_H
 
-#include "../engine.h"
+typedef enum {
+    FAILED = -1,
+    NOT_FOUND = 0,
+    OK = 1
+} KVStatus;
 
-namespace pmemkv {
-namespace blackhole {
-
-const std::string ENGINE = "blackhole";
-
-class Blackhole : public EngineBase {
-  public:
-    Blackhole();
-    ~Blackhole();
-
-    std::string Engine() final { return ENGINE; }
-    void All(void* context, AllCallback* callback) final;
-    void AllAbove(void* context, const std::string& key, AllCallback* callback) final;
-    void AllBelow(void* context, const std::string& key, AllCallback* callback) final;
-    void AllBetween(void* context, const std::string& key1, const std::string& key2, AllCallback* callback) final;
-    int64_t Count() final;
-    int64_t CountAbove(const std::string& key) final;
-    int64_t CountBelow(const std::string& key) final;
-    int64_t CountBetween(const std::string& key1, const std::string& key2) final;
-    void Each(void* context, EachCallback* callback) final;
-    void EachAbove(void* context, const std::string& key, EachCallback* callback) final;
-    void EachBelow(void* context, const std::string& key, EachCallback* callback) final;
-    void EachBetween(void* context, const std::string& key1, const std::string& key2, EachCallback* callback) final;
-    Status Exists(const std::string& key) final;
-    void Get(void* context, const std::string& key, GetCallback* callback) final;
-    Status Put(const std::string& key, const std::string& value) final;
-    Status Remove(const std::string& key) final;
-};
-
-} // namespace blackhole
-} // namespace pmemkv
+#endif /* PMEMKV_STATUS_H */

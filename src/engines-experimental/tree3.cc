@@ -68,7 +68,7 @@ Tree::~Tree() {
 // KEY/VALUE METHODS
 // ===============================================================================================
 
-void Tree::All(void* context, KVAllCallback* callback) {
+void Tree::All(void* context, AllCallback* callback) {
     LOG("All");
     auto leaf = pmpool.root()->head;
     while (leaf) {
@@ -95,7 +95,7 @@ int64_t Tree::Count() {
     return result;
 }
 
-void Tree::Each(void* context, KVEachCallback* callback) {
+void Tree::Each(void* context, EachCallback* callback) {
     LOG("Each");
     auto leaf = pmpool.root()->head;
     while (leaf) {
@@ -108,7 +108,7 @@ void Tree::Each(void* context, KVEachCallback* callback) {
     }
 }
 
-KVStatus Tree::Exists(const std::string& key) {
+Status Tree::Exists(const std::string& key) {
     LOG("Exists for key=" << key);
     auto leafnode = LeafSearch(key);
     if (leafnode) {
@@ -124,7 +124,7 @@ KVStatus Tree::Exists(const std::string& key) {
     return NOT_FOUND;
 }
 
-void Tree::Get(void* context, const std::string& key, KVGetCallback* callback) {
+void Tree::Get(void* context, const std::string& key, GetCallback* callback) {
     LOG("Get using callback for key=" << key);
     auto leafnode = LeafSearch(key);
     if (leafnode) {
@@ -144,7 +144,7 @@ void Tree::Get(void* context, const std::string& key, KVGetCallback* callback) {
     LOG("   could not find key");
 }
 
-KVStatus Tree::Put(const std::string& key, const std::string& value) {
+Status Tree::Put(const std::string& key, const std::string& value) {
     LOG("Put key=" << key.c_str() << ", value.size=" << std::to_string(value.size()));
     try {
         const auto hash = PearsonHash(key.c_str(), key.size());
@@ -186,7 +186,7 @@ KVStatus Tree::Put(const std::string& key, const std::string& value) {
     }
 }
 
-KVStatus Tree::Remove(const std::string& key) {
+Status Tree::Remove(const std::string& key) {
     LOG("Remove key=" << key.c_str());
     auto leafnode = LeafSearch(key);
     if (!leafnode) {
