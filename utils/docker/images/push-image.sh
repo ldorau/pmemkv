@@ -39,7 +39,7 @@
 # for automated builds.
 #
 
-set -e
+set -ex
 
 function usage {
 	echo "Usage:"
@@ -67,5 +67,7 @@ fi
 # Log in to the Docker Hub
 docker login -u="$DOCKERHUB_USER" -p="$DOCKERHUB_PASSWORD"
 
+docker tag ${DOCKERHUB_REPO}:$1 ${DOCKERHUB_REPO}:$1-${IMAGE_SUFFIX}
+
 # Push the image to the repository
-docker push ${DOCKERHUB_REPO}:$1
+docker push ${DOCKERHUB_REPO}:$1-${IMAGE_SUFFIX}

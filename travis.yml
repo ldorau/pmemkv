@@ -18,10 +18,15 @@ env:
     - TYPE=coverity OS=ubuntu OS_VER=19.04
 
 before_install:
+  - export IMAGE_SUFFIX=bindings
   - echo $TRAVIS_COMMIT_RANGE
   - export HOST_WORKDIR=`pwd`
   - export GITHUB_REPO=pmem/pmemkv
-  - export DOCKERHUB_REPO=pmem/pmemkv
+  - export DOCKERHUB_REPO=ldorau/pmemkv
+  - export TRAVIS_REPO_SLUG=${GITHUB_REPO}
+  - export TRAVIS_BRANCH="master"
+  - export TRAVIS_EVENT_TYPE="build"
+  - export PUSH_IMAGE="1"
   - cd utils/docker
   - ./pull-or-rebuild-image.sh
   - if [[ -f push_image_to_repo_flag ]]; then PUSH_THE_IMAGE=1; fi
