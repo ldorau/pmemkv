@@ -44,10 +44,78 @@
 #include "engines-experimental/stree.h"
 #include "engines-experimental/caching.h"
 #endif
+#include <unordered_map>
+
+typedef struct PmemkvConfigValue PmemkvConfigValue;
+typedef std::unordered_map<std::string, PmemkvConfigValue> umap_t;
+
+struct PmemkvConfigValue {
+	char *buffer;
+	int32_t size;
+};
+
+struct PmemkvConfig {
+	umap_t umap;
+};
+
+PmemkvConfig*
+pmemkv_config_new(void)
+{
+	return new PmemkvConfig;
+}
+
+void
+pmemkv_config_delete(PmemkvConfig* config)
+{
+	for (auto element : config->umap)
+		delete[] element.second.buffer;
+
+	delete config;
+}
+
+int8_t
+pmemkv_config_put(PmemkvConfig* config, const char* key,
+			const void* value, int32_t value_len)
+{
+	std::string mkey(key);
+
+	PmemkvConfigValue mvalue;
+	mvalue.size = value_len;
+	mvalue.buffer = new char [mvalue.size];
+	memcpy(mvalue.buffer, value, mvalue.size);
+
+	config->umap[mkey] = mvalue;
+
+	return 0;
+}
+
+int32_t
+pmemkv_config_get(PmemkvConfig* config, const char* key,
+			void* buffer, int32_t buffer_len,
+			int32_t *value_len)
+{
+	std::string mkey(key);
+
+	if (config->umap.find(mkey) == config->umap.end())
+		return -1;
+
+	PmemkvConfigValue mvalue = config->umap[mkey];
+	int32_t len = 0;
+
+	if (buffer) {
+		len = std::min(buffer_len, mvalue.size);
+		memcpy(buffer, mvalue.buffer, len);
+	}
+
+	if (value_len)
+		*value_len = mvalue.size;
+
+	return len;
+}
 
 // XXX: remove start failure callback - instead use out parameter for
 // kvengine_engine and return status.
-PmemkvEngine* kvengine_start(void* context, const char* engine, const char* config,
+PmemkvEngine* kvengine_start(void* context, const char* engine, PmemkvConfig* config,
                                     KVStartFailureCallback* callback) {
     try {
         if (engine == pmemkv::blackhole::ENGINE) {
@@ -57,16 +125,21 @@ PmemkvEngine* kvengine_start(void* context, const char* engine, const char* conf
             return reinterpret_cast<PmemkvEngine*>(new caching::CachingEngine(context, config));
 #endif
         } else {  // handle traditional engines expecting path & size params
-            rapidjson::Document d;
-            if (d.Parse(config).HasParseError()) {
-                throw std::runtime_error("Config could not be parsed as JSON");
-            } else if (!d.HasMember("path") || !d["path"].IsString()) {
-                throw std::runtime_error("Config does not include valid path string");
-            } else if (d.HasMember("size") && !d["size"].IsInt64()) {
-                throw std::runtime_error("Config does not include valid size integer");
-            }
-            auto path = d["path"].GetString();
-            size_t size = d.HasMember("size") ? (size_t) d["size"].GetInt64() : 1073741824;
+            int32_t length;
+            if (pmemkv_config_get(config, "path", NULL, 0, &length))
+                    throw std::runtime_error("Config does not include 'path' entry");
+            char path[length];
+            if (pmemkv_config_get(config, "path", path, length, NULL) != length)
+                    throw std::runtime_error("Cannot get the 'path' entry");
+
+            if (pmemkv_config_get(config, "size", NULL, 0, &length))
+                    throw std::runtime_error("Config does not include 'size'");
+            if (length != sizeof(size_t))
+                    throw std::runtime_error("Wrong size of the 'size' entry");
+            size_t size;
+            if (pmemkv_config_get(config, "size", &size, length, NULL) != length)
+                    throw std::runtime_error("Cannot get the 'size' entry");
+
 #ifdef EXPERIMENTAL
             if (engine == pmemkv::tree3::ENGINE) {
                 return reinterpret_cast<PmemkvEngine*>(new tree3::Tree(context, path, size));

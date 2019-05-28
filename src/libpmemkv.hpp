@@ -51,7 +51,7 @@ typedef void KVGetStringFunction(const std::string &key);
 
 class KVEngine {
 public:
-	KVEngine(const char* engine_name, const char* config);
+	KVEngine(const char* engine_name, PmemkvConfig* config);
 
 	~KVEngine();
 
@@ -142,7 +142,7 @@ extern "C" {
 		c->second->append(v, vb);
 	}
 
-	inline void callOnStartCallback(void* context, const char* engine, const char* config, const char* msg) {
+	inline void callOnStartCallback(void* context, const char* engine, PmemkvConfig* config, const char* msg) {
 		*((std::string*) context) = msg;
 	}
 }
@@ -159,7 +159,7 @@ inline void KVEngine::All(std::function<KVAllStringFunction> f) {
 	kvengine_all(this->engine, &f, callKVAllStringFunction);
 }
 
-inline KVEngine::KVEngine(const char* engine_name, const char* config) {
+inline KVEngine::KVEngine(const char* engine_name, PmemkvConfig* config) {
 	std::string errormsg;
 
 	this->engine = kvengine_start(&errormsg, engine_name, config, callOnStartCallback);

@@ -46,18 +46,20 @@ public:
     KVEngine* kv;
 
     VSMapBaseTest() {
-        char config[255];
-        auto n = sprintf(config, "{\"path\": \"%s\", \"size\" : %lu}", PATH.c_str(), POOL_SIZE);
-
-        if (n < 0)
-            throw std::runtime_error("sprintf failed");
-
+        const char *path = "/dev/shm\0";
+        config = pmemkv_config_new();
+        pmemkv_config_put(config, "path", path, strlen(path) + 1);
+        pmemkv_config_put(config, "size", &SIZE, sizeof(SIZE));
         kv = new KVEngine("vsmap", config);
     }
 
     ~VSMapBaseTest() {
+        pmemkv_config_delete(config);
         delete kv;
     }
+
+protected:
+    PmemkvConfig *config;
 };
 
 using VSMapTest = VSMapBaseTest<SIZE>;
