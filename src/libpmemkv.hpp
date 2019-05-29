@@ -52,7 +52,7 @@ typedef void KVGetStringFunction(const std::string &key);
 class KVEngine {
 public:
 	// XXX - remove context.
-	KVEngine(void *context, const std::string& engine_name, const std::string& config);
+	KVEngine(void *context, const std::string& engine_name, PmemkvConfig* config);
 
 	~KVEngine();
 
@@ -145,7 +145,7 @@ extern "C" {
 		c->second->append(v, vb);
 	}
 
-	inline void callOnStartCallback(void* context, const char* engine, const char* config, const char* msg) {
+	inline void callOnStartCallback(void* context, const char* engine, PmemkvConfig* config, const char* msg) {
 		return;
 	}
 }
@@ -166,11 +166,11 @@ inline void KVEngine::All(std::function<KVAllStringFunction> f) {
 	kvengine_all(this->engine, &f, callKVAllStringFunction);
 }
 
-inline KVEngine::KVEngine(void *context, const std::string& engine_name, const std::string& config) {
+inline KVEngine::KVEngine(void *context, const std::string& engine_name, PmemkvConfig* config) {
 	std::string errormsg;
 
 	// XXX - change kvengine_start to return status
-	this->engine = kvengine_start(context, engine_name.c_str(), config.c_str(), callOnStartCallback);
+	this->engine = kvengine_start(context, engine_name.c_str(), config, callOnStartCallback);
 
 	if (this->engine == nullptr)
 		throw std::runtime_error("Could not start engine.");

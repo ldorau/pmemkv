@@ -43,13 +43,22 @@ extern "C" {
 #include "status.h"
 
 typedef struct PmemkvEngine PmemkvEngine;
+typedef struct PmemkvConfig PmemkvConfig;
 
 typedef void KVAllCallback(void* context, int keybytes, const char* key);
 typedef void KVEachCallback(void* context, int keybytes, const char* key, int valuebytes, const char* value);
 typedef void KVGetCallback(void* context, int valuebytes, const char* value);
-typedef void KVStartFailureCallback(void* context, const char* engine, const char* config, const char* msg);
+typedef void KVStartFailureCallback(void* context, const char* engine, PmemkvConfig* config, const char* msg);
 
-PmemkvEngine* kvengine_start(void* context, const char* engine, const char* config, KVStartFailureCallback* callback);
+PmemkvConfig* pmemkv_config_new(void);
+void pmemkv_config_delete(PmemkvConfig* config);
+int8_t pmemkv_config_put(PmemkvConfig* config, const char* key,
+			const void* value, int32_t value_len);
+int32_t pmemkv_config_get(PmemkvConfig* config, const char* key,
+			void* buffer, int32_t buffer_len,
+			int32_t *value_len);
+
+PmemkvEngine* kvengine_start(void* context, const char* engine, PmemkvConfig* config, KVStartFailureCallback* callback);
 void kvengine_stop(PmemkvEngine* kv);
 
 void kvengine_all(PmemkvEngine* kv, void* context, KVAllCallback* c);

@@ -53,6 +53,7 @@ class CMapBaseTest : public testing::Test {
     }
 
     ~CMapBaseTest() {
+        pmemkv_config_delete(config);
         delete kv;
     }
     void Restart() {
@@ -60,13 +61,12 @@ class CMapBaseTest : public testing::Test {
         Start();
     }
   protected:
+    PmemkvConfig *config;
     void Start() {
-        char config[255];
-        auto n = sprintf(config, "{\"path\": \"%s\", \"size\" : %lu}", PATH.c_str(), POOL_SIZE);
-
-        if (n < 0)
-            throw std::runtime_error("sprintf failed");
-
+        const char *path = "/dev/shm/pmemkv";
+        config = pmemkv_config_new();
+        pmemkv_config_put(config, "path", path, strlen(path) + 1);
+        pmemkv_config_put(config, "size", &SIZE, sizeof(SIZE));
         kv = new KVEngine(nullptr, "cmap", config);
     }
 };
