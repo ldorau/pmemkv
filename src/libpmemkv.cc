@@ -30,6 +30,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <iostream>
 #include <rapidjson/document.h>
 
 #include "libpmemkv.h"
@@ -151,6 +152,7 @@ PmemkvEngine* kvengine_start(void* context, const char* engine, PmemkvConfig* co
 #endif
 		struct stat info;
                 if ((stat(path, &info) < 0) || !S_ISDIR(info.st_mode)) {
+                    std::cout << "Value of PATH = <" << path << ">\n";
                     throw std::runtime_error("Config path is not an existing directory");
                 } else if (engine == pmemkv::vsmap::ENGINE) {
                     return reinterpret_cast<PmemkvEngine*>(new pmemkv::vsmap::VSMap(context, path, size));
