@@ -50,7 +50,9 @@ echo $USERPASS | sudo -S make install
 
 cd ~
 echo $USERPASS | sudo -S gem install bundler -v '< 2.0'
-git clone https://github.com/pmem/pmemkv-ruby.git
+git clone https://github.com/ldorau/pmemkv-ruby.git
 cd pmemkv-ruby
+BRANCH=Adjust-Ruby-bindings-to-the-new-Pmemkv-config-API
+git checkout -b $BRANCH origin/$BRANCH
 echo $USERPASS | sudo -S bundle install
 LD_LIBRARY_PATH=$PREFIX/lib/:/opt/tbb/lib/intel64/gcc4.7/ bundle exec rspec
