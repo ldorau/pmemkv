@@ -140,11 +140,11 @@ typedef struct KVEngine KVEngine;
 
 pmemkv_config *pmemkv_config_new(void);
 void pmemkv_config_delete(pmemkv_config *config);
-int pmemkv_config_put(pmemkv_config *config, const char *key,
+KVStatus pmemkv_config_put(pmemkv_config *config, const char *key,
 			const void *value, size_t value_size);
 ssize_t pmemkv_config_get(pmemkv_config *config, const char *key,
 			void *buffer, size_t buffer_len, size_t *value_size);
-int pmemkv_config_from_json(pmemkv_config *config, const char *jsonconfig);
+KVStatus pmemkv_config_from_json(pmemkv_config *config, const char *jsonconfig);
 
 KVEngine* kvengine_start(void* context, const char* engine, pmemkv_config *config, KVStartFailureCallback* callback);
 void kvengine_stop(KVEngine* kv);

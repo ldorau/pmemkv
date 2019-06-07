@@ -81,7 +81,7 @@ pmemkv_config_delete(pmemkv_config *config)
 	delete config;
 }
 
-int
+KVStatus
 pmemkv_config_put(pmemkv_config *config, const char *key,
 			const void *value, size_t value_size)
 {
@@ -90,10 +90,10 @@ pmemkv_config_put(pmemkv_config *config, const char *key,
 		std::vector<char> v((char *)value, (char *)value + value_size);
 		config->umap.insert({mkey, v});
 	} catch (...) {
-		return -1;
+		return FAILED;
 	}
 
-	return 0;
+	return OK;
 }
 
 ssize_t
@@ -126,7 +126,7 @@ pmemkv_config_get(pmemkv_config *config, const char *key,
 	return len;
 }
 
-int
+KVStatus
 pmemkv_config_from_json(pmemkv_config *config, const char *jsonconfig)
 {
 	rapidjson::Document doc;
@@ -183,16 +183,16 @@ pmemkv_config_from_json(pmemkv_config *config, const char *jsonconfig)
 			if (pmemkv_config_put(config,
 					itr->name.GetString(),
 					value,
-					value_size))
+					value_size) == FAILED)
 				throw std::runtime_error(
 					"Inserting a new entry to the config failed");
 		}
 	} catch (const std::exception &exc) {
 		std::cerr << exc.what() << "\n";
-		return -1;
+		return FAILED;
 	}
 
-	return 0;
+	return OK;
 }
 
 } /* extern "C" */
