@@ -49,8 +49,12 @@ make -j2
 echo $USERPASS | sudo -S make install
 
 cd ~
-echo $USERPASS | sudo -S gem install bundler -v '< 2.0'
-git clone https://github.com/pmem/pmemkv-ruby.git
-cd pmemkv-ruby
-echo $USERPASS | sudo -S bundle install
-LD_LIBRARY_PATH=$PREFIX/lib/:/opt/tbb/lib/intel64/gcc4.7/ bundle exec rspec
+git clone -b nodejs-str https://github.com/annamarcink/pmemkv-nodejs.git
+cd pmemkv-nodejs
+npm install node-gyp
+npm install bindings
+npm install chai
+npm install chai-string
+npm install mocha
+npm install
+LD_LIBRARY_PATH=$PREFIX/lib/:/opt/tbb/lib/intel64/gcc4.7/ npm test

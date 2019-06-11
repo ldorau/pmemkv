@@ -28,9 +28,9 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-if(PKG_CONFIG_FOUND)
-	pkg_check_modules(TBB tbb)
-endif()
+#if(PKG_CONFIG_FOUND)
+	#pkg_check_modules(TBB tbb)
+#endif()
 
 if(NOT TBB_FOUND)
 	# find_package without unsetting this var is not working correctly
