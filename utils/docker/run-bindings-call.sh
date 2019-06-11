@@ -34,27 +34,7 @@
 # run-bindings.sh - runs bindings
 #
 
-set -ex
-echo $USERPASS | sudo -S mount -oremount,size=4G /dev/shm
+set -x
 
-cd $WORKDIR
-PREFIX=/usr/local
-
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release \
-	-DTBB_DIR=/opt/tbb/cmake \
-	-DCMAKE_INSTALL_PREFIX=$PREFIX
-make -j2
-echo $USERPASS | sudo -S make install
-
-cd ~
-git clone -b nodejs-str https://github.com/annamarcink/pmemkv-nodejs.git
-cd pmemkv-nodejs
-npm install node-gyp
-npm install bindings
-npm install chai
-npm install chai-string
-npm install mocha
-npm install
-LD_LIBRARY_PATH=$PREFIX/lib/:/opt/tbb/lib/intel64/gcc4.7/ npm test
+./run-bindings.sh || /bin/bash -i
+exit 0

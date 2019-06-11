@@ -81,7 +81,7 @@ if [[ "$command" == "" ]]; then
 			command="./run-coverity.sh";
 			;;
 		bindings)
-			command="./run-bindings.sh";
+			command="./run-bindings-call.sh";
 			;;
 	esac
 fi
