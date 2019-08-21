@@ -118,8 +118,12 @@ export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
 git clone https://github.com/pmem/pmemkv-java.git
 cd pmemkv-java
 git checkout $JAVA_VERSION
-mvn dependency:go-offline
-mvn install
+mvn dependency:go-offline \
+	-Dhttp.proxyHost=proxy-chain.intel.com -Dhttp.proxyPort=911 \
+	-Dhttps.proxyHost=proxy-chain.intel.com -Dhttps.proxyPort=912
+mvn install \
+	-Dhttp.proxyHost=proxy-chain.intel.com -Dhttp.proxyPort=911 \
+	-Dhttps.proxyHost=proxy-chain.intel.com -Dhttps.proxyPort=912
 mv -v ~/.m2/repository /opt/bindings/java/
 
 #
