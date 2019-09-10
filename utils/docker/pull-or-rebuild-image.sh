@@ -47,7 +47,7 @@
 # Docker Hub.
 #
 
-set -e
+set -ex
 
 if [[ "$TRAVIS_EVENT_TYPE" != "cron" && "$TRAVIS_BRANCH" != "coverity_scan" \
 	&& "$TYPE" == "coverity" ]]; then
@@ -116,6 +116,8 @@ for file in $files; do echo $file; done
 # Path to directory with Dockerfiles and image building scripts
 images_dir_name=images
 base_dir=utils/docker/$images_dir_name
+
+files=utils/docker/images/install-bindings-dependencies.sh
 
 # Check if committed file modifications require the Docker image to be rebuilt
 for file in $files; do
