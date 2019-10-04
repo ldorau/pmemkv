@@ -36,7 +36,18 @@
 #                        and automatic update of the documentation
 #
 
-set -e
+set -ex
+
+	echo "Running auto doc update"
+
+	mkdir -p $WORKDIR/doc_update
+	cd $WORKDIR/doc_update
+
+	$SCRIPTSDIR/run-doc-update.sh
+
+	cd $WORKDIR
+	rm -rf $WORKDIR/doc_update
+exit 0
 
 EXAMPLE_TEST_DIR="/tmp/build_example"
 PREFIX=/usr

@@ -32,7 +32,9 @@
 
 set -e
 
-ORIGIN="https://${GITHUB_TOKEN}@github.com/pmem-bot/pmemkv"
+TAG="1.0.1"
+DIR="v$(echo ${TAG} | cut -d. -f1-2)"
+ORIGIN="https://github.com/ldorau/pmemkv"
 UPSTREAM="https://github.com/pmem/pmemkv"
 CURR_DIR=$(pwd)
 
@@ -40,13 +42,12 @@ CURR_DIR=$(pwd)
 git clone ${ORIGIN}
 cd $CURR_DIR/pmemkv
 git remote add upstream ${UPSTREAM}
+git fetch upstream --tags
 
-git config --local user.name "pmem-bot"
-git config --local user.email "pmem-bot@intel.com"
+git config --local user.name "Lukasz Dorau"
+git config --local user.email "lukasz.dorau@intel.com"
 
-git checkout master
-git remote update
-git rebase upstream/master
+git checkout $TAG
 
 # Build docs
 mkdir $CURR_DIR/pmemkv/build
@@ -64,8 +65,10 @@ cd $CURR_DIR/pmemkv
 # Checkout gh-pages and copy docs
 git checkout -fb gh-pages upstream/gh-pages
 git clean -df
-cp -f $CURR_DIR/doc/*.md master/manpages/
-cp -fr $CURR_DIR/cpp_html/* master/doxygen/
+mkdir -p $DIR/manpages/
+mkdir -p $DIR/doxygen/
+cp -f $CURR_DIR/doc/*.md $DIR/manpages/
+cp -fr $CURR_DIR/cpp_html/* $DIR/doxygen/
 
 # Fix the title tag:
 # get rid of _MP macro, it changes e.g. "_MP(PMEMKV, 7)" to "PMEMKV"
@@ -81,6 +84,6 @@ git push -f ${ORIGIN} gh-pages
 
 # Makes pull request.
 # When there is already an open PR or there are no changes an error is thrown, which we ignore.
-hub pull-request -f -b pmem:gh-pages -h pmem-bot:gh-pages -m "doc: automatic gh-pages docs update" && true
+# hub pull-request -f -b pmem:gh-pages -h pmem-bot:gh-pages -m "doc: automatic gh-pages docs update" && true
 
 exit 0
