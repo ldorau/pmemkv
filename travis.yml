@@ -21,7 +21,7 @@ before_install:
   - echo $TRAVIS_COMMIT_RANGE
   - export HOST_WORKDIR=`pwd`
   - export GITHUB_REPO=pmem/pmemkv
-  - export DOCKERHUB_REPO=pmem/pmemkv
+  - export DOCKERHUB_REPO=ldorau/pmemkv
   - cd utils/docker
   - ./pull-or-rebuild-image.sh
   - if [[ -f push_image_to_repo_flag ]]; then PUSH_THE_IMAGE=1; fi
@@ -32,4 +32,4 @@ script:
   - ./build.sh
 
 after_success:
-  - if [[ $PUSH_THE_IMAGE -eq 1 ]]; then images/push-image.sh $OS-$OS_VER; fi
+  - if [[ $PUSH_THE_IMAGE -eq 1 ]]; then date; fi
