@@ -137,6 +137,11 @@ if [ "$COVERAGE" == "1" ]; then
 	upload_codecov tests
 fi
 
+
+TBB_PC_PATH=$(find /usr -name "tbb.pc" 2>/dev/null || true)
+[ "$TBB_PC_PATH" == "" ] && exit 0
+
+
 # Verify installed libraries
 compile_example_standalone pmemkv_basic_c
 run_example_standalone pmemkv_basic_c pool
