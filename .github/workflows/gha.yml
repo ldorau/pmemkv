@@ -7,31 +7,31 @@
 # when we decide to switch from Travis to GitHub Actions. The 'XXX_DISABLE_' suffix should be removed then.
 #
 
-name: pmemkv
+name: ArchLinux
 on: [push, pull_request]
 
 env:
+    OS:         archlinux-base
+    OS_VER:     latest
+    #
     REPO:           pmemkv
     GITHUB_REPO:    pmem/pmemkv
-    DOCKERHUB_REPO: pmem/pmemkv
+    DOCKERHUB_REPO: ldorau/pmemkv
+    #
+    TEST_PACKAGES:     OFF # memkind too old
+    CHECK_CPP_STYLE:   OFF # clang-format too new (> 9.0)
 
 jobs:
   linux:
-    name: pmemkv
+    name: ArchLinux
     runs-on: ubuntu-latest
     env:
       HOST_WORKDIR:   /home/runner/work/pmemkv/pmemkv
       WORKDIR:        utils/docker
     strategy:
       matrix:
-        CONFIG: ["TYPE=normal OS=fedora OS_VER=31",
-                 "TYPE=normal OS=ubuntu OS_VER=19.10",
-                 "TYPE=normal OS=ubuntu OS_VER=19.10 COVERAGE=1",
-                 "TYPE=building OS=fedora OS_VER=31 COVERAGE=1 PUSH_IMAGE=1 XXX_DISABLE_AUTO_DOC_UPDATE=1",
-                 "TYPE=building OS=ubuntu OS_VER=19.10 COVERAGE=1 PUSH_IMAGE=1",
-                 "TYPE=bindings OS=ubuntu OS_VER=19.10_bindings PUSH_IMAGE=1",
-                 "TYPE=compatibility OS=fedora OS_VER=31",
-                 "TYPE=coverity OS=ubuntu OS_VER=19.10"]
+        CONFIG: ["TYPE=normal",
+                 "TYPE=building"]
     steps:
        - name: Clone the git repo
          uses: actions/checkout@v1
