@@ -7,31 +7,36 @@
 # when we decide to switch from Travis to GitHub Actions. The 'XXX_DISABLE_' suffix should be removed then.
 #
 
-name: pmemkv
+name: Rebuild ALL
 on: [push, pull_request]
 
 env:
     REPO:           pmemkv
     GITHUB_REPO:    pmem/pmemkv
-    DOCKERHUB_REPO: pmem/pmemkv
+    DOCKERHUB_REPO: ldorau/pmemkv
+    #
+    DOCKERHUB_USER:     ldorau
+    DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
 jobs:
   linux:
-    name: pmemkv
+    name: Rebuild
     runs-on: ubuntu-latest
     env:
       HOST_WORKDIR:   /home/runner/work/pmemkv/pmemkv
       WORKDIR:        utils/docker
+      TYPE:           normal
     strategy:
+      fail-fast: false
       matrix:
-        CONFIG: ["TYPE=normal OS=fedora OS_VER=31",
-                 "TYPE=normal OS=ubuntu OS_VER=19.10",
-                 "TYPE=normal OS=ubuntu OS_VER=19.10 COVERAGE=1",
-                 "TYPE=building OS=fedora OS_VER=31 COVERAGE=1 PUSH_IMAGE=1 XXX_DISABLE_AUTO_DOC_UPDATE=1",
-                 "TYPE=building OS=ubuntu OS_VER=19.10 COVERAGE=1 PUSH_IMAGE=1",
-                 "TYPE=bindings OS=ubuntu OS_VER=19.10_bindings PUSH_IMAGE=1",
-                 "TYPE=compatibility OS=fedora OS_VER=31",
-                 "TYPE=coverity OS=ubuntu OS_VER=19.10"]
+        CONFIG: ["OS=archlinux-base OS_VER=latest",
+                 "OS=centos OS_VER=8",
+                 "OS=debian OS_VER=testing",
+                 "OS=debian OS_VER=unstable",
+                 "OS=fedora OS_VER=rawhide",
+                 "OS=opensuse-leap OS_VER=latest",
+                 "OS=opensuse-tumbleweed OS_VER=latest",
+                 "OS=ubuntu OS_VER=rolling"]
     steps:
        - name: Clone the git repo
          uses: actions/checkout@v1
@@ -39,8 +44,5 @@ jobs:
        - name: Pull or rebuild the image
          run: cd $WORKDIR && ${{ matrix.CONFIG }} ./pull-or-rebuild-image.sh
 
-       - name: Run the build
-         run: cd $WORKDIR && ${{ matrix.CONFIG }} ./build.sh
-
        - name: Push the image
-         run: cd $WORKDIR && source ./set-vars.sh && ${{ matrix.CONFIG }} /bin/bash -c "if [[ -f XXX_DISABLE_${CI_FILE_PUSH_IMAGE_TO_REPO} ]]; then images/push-image.sh $OS-$OS_VER; fi"
+         run: cd $WORKDIR && ${{ matrix.CONFIG }} images/push-image.sh $OS-$OS_VER
